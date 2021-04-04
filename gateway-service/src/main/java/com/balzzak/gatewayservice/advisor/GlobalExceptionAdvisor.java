@@ -1,5 +1,6 @@
 package com.balzzak.gatewayservice.advisor;
 
+import com.balzzak.common.exception.BalzzakException;
 import com.balzzak.common.exception.CommonErrorCode;
 import com.balzzak.common.exception.ErrorResponseDto;
 import lombok.extern.slf4j.Slf4j;
@@ -134,6 +135,15 @@ public class GlobalExceptionAdvisor extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(Exception.class)
     protected ResponseEntity<ErrorResponseDto> handleException(Exception ex) {
+        printExceptionLog(ex);
+
+        String message = "Unexpected error";
+        final ErrorResponseDto errorResponseDto = ErrorResponseDto.of(CommonErrorCode.INTERNAL_SERVER_ERROR, message, ex);
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.valueOf(errorResponseDto.getStatus()));
+    }
+
+    @ExceptionHandler(BalzzakException.class)
+    protected ResponseEntity<ErrorResponseDto> handleBalzzakException(Exception ex) {
         printExceptionLog(ex);
 
         String message = "Unexpected error";
